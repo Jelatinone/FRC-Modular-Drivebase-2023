@@ -34,16 +34,16 @@ public class RobotContainer
       for(int i = 0; i <= 20 && Objects.equals(M_Controller,null); i++)
       {
         try{M_Controller = new CommandXboxController(i);}
-        catch(NullPointerException x) {M_Controller = null; System.out.println("Error: XboxController Not Found"); System.exit(0);}
+        catch(NullPointerException x) {M_Controller = null; System.out.println("Error: XboxController Not Found");}
       }
       //Buttons
       try{Controller_A = M_Controller.a(); }
-      catch(NullPointerException x) {System.out.println("Error: XboxController A Button Not Found"); System.exit(0);}
-      try{Controller_A = M_Controller.b(); }
-      catch(NullPointerException x) {System.out.println("Error: XboxController B Button Not Found"); System.exit(0);}
+      catch(NullPointerException x) {System.out.println("Error: XboxController A Button Not Found");}
+      try{Controller_B = M_Controller.b(); }
+      catch(NullPointerException x) {System.out.println("Error: XboxController B Button Not Found");}
       //Gyroscopes
       try{M_Gyro = new Pigeon2(4);}
-      catch(NullPointerException x) {System.out.println("Error: Gyroscope Not Found"); System.exit(0);}
+      catch(NullPointerException x) {System.out.println("Error: Gyroscope Not Found");}
       //Subsystems
       M_Drive = new SwerveSubsystem(M_Gyro);  
       //Set Default
@@ -60,18 +60,12 @@ public class RobotContainer
   private void configureButtonBindings() 
   {
     //When A Pressed, Increment Rotational Face.
-    Controller_A.onFalse(Commands.run(M_Drive::IncrementRotationalFace));
+    Controller_A.onTrue(Commands.run(M_Drive::IncrementRotationalFace));
     //When B Pressed, Decrement Rotational Face.
-    Controller_B.onFalse(Commands.run(M_Drive::DecrementRotationalFace));
+    Controller_B.onTrue(Commands.run(M_Drive::DecrementRotationalFace));
   }
   //ACESSORS
 
-  //Return Drive
-  public SwerveSubsystem getDrive(){return M_Drive;}
   //Return Autonomous Command
   public Command getAutonomousCommand(){return new AutonomousDriveCommand(M_Drive);}
-  //Return Controller
-  public CommandXboxController getController(){return M_Controller;}
-  //Return Gyroscope
-  public Pigeon2 getGyro() {return M_Gyro;}
 }
