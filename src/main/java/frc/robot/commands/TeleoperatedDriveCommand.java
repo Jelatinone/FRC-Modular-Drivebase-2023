@@ -7,7 +7,6 @@ import frc.robot.subsystems.SwerveSubsystem;
 //Libraries
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import edu.wpi.first.math.controller.PIDController;
-import com.ctre.phoenix.sensors.Pigeon2;
 import com.ctre.phoenix.motorcontrol.can.WPI_TalonFX;
 import java.util.function.DoubleSupplier;
 import java.util.Objects;
@@ -28,7 +27,7 @@ public class TeleoperatedDriveCommand extends CommandBase
 
 
   //Constructors
-  public TeleoperatedDriveCommand(SwerveSubsystem Parent, DoubleSupplier Left_X, DoubleSupplier Left_Y, DoubleSupplier Right_X,Pigeon2 gyro)
+  public TeleoperatedDriveCommand(SwerveSubsystem Parent, DoubleSupplier Left_X, DoubleSupplier Left_Y, DoubleSupplier Right_X)
   {
     //Joystick Assignment
     if(Left_X.getAsDouble() > Constants.JOYSTICK_DEADZONE){JoystickL_X = Left_X.getAsDouble();}else{JoystickL_X = 0.0;}
