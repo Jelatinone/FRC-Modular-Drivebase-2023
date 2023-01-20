@@ -51,8 +51,7 @@ public class RobotContainer
       M_Drive,
       () -> M_Controller.getLeftX(),
       () -> M_Controller.getLeftY(),
-      () -> M_Controller.getRightX(),
-      M_Gyro));     
+      () -> M_Controller.getRightX()));     
       //Configure Bindings
       configureButtonBindings();
   }
