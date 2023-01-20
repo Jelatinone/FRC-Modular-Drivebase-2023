@@ -32,15 +32,7 @@ public class AutonomousDriveCommand extends CommandBase
     @Override
     public void execute() 
     {
-        //Perform Circles
-        //K-Motors
-        (Parent_Subsystem.getKRotate()[0]).set(1);
-        (Parent_Subsystem.getKDrive()[0]).set(0.5);
-        //N-Motors
-        (Parent_Subsystem.getNDrives()[2]).setInverted(true);
-        (Parent_Subsystem.getNDrives()[2]).set(1);
-        (Parent_Subsystem.getNRotates()[2]).setInverted(true);
-        (Parent_Subsystem.getNRotates()[2]).set(0.5);
+        new TeleoperatedDriveCommand(Parent_Subsystem,() -> 0.1 ,() -> 0.1,() ->1.0);
         Command_Complete = true;
     }
     //End Command
