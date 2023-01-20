@@ -86,7 +86,7 @@ public class SwerveSubsystem extends SubsystemBase
   //Increment
   public void IncrementRotationalFace(){if(Objects.equals(R_Face,(Constants.FACE_COUNT-1))) {R_Face = 0;} else {R_Face++;}}
   //Add Two Faces
-  public int addFaces(int Face_One, int Face_Two){if((Face_One + Face_Two) > (Constants.FACE_COUNT-1)){return ((Face_One + Face_Two) - Constants.FACE_COUNT-3);}else{return (Face_One + Face_Two);} }
+  public int addFaces(int Face_One, int Face_Two){if((Face_One + Face_Two) > (Constants.FACE_COUNT-1)){return ((Face_One + Face_Two) - Constants.FACE_COUNT);}else{return (Face_One + Face_Two);} }
 
   //ACESSORS
 
