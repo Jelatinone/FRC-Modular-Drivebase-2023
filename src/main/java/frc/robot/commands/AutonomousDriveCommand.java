@@ -32,7 +32,7 @@ public class AutonomousDriveCommand extends CommandBase
     @Override
     public void execute() 
     {
-        new TeleoperatedDriveCommand(Parent_Subsystem,() -> 0.1 ,() -> 0.1,() ->1.0);
+        Parent_Subsystem.SwerveDrive(0.1, 0.1, 1.0);
         Command_Complete = true;
     }
     //End Command

@@ -51,7 +51,7 @@ public class SwerveSubsystem extends SubsystemBase
       if(!Objects.equals(i,Constants.FACE_COUNT-1)) {Rotational_Groups[i] = new WPI_TalonFX[] {Rotational[i],Rotational[i+1]};}
       if(!Objects.equals(i,Constants.FACE_COUNT-1)) {Drive_Groups[i] = new WPI_TalonFX[] {Drive[i],Drive[i+1]};}
       if(Objects.equals((i % 2),0)){Rotational[i].setInverted(true);}
-      Rotational[i].set((Objects.equals((i%2),0))? (M_PID.calculate(Math.atan(-180/Constants.FACE_COUNT))): (M_PID.calculate(Math.atan(180/Constants.FACE_COUNT))));
+      Rotational[i].set((Objects.equals((i % 2),0))? (M_PID.calculate(Math.atan(-180/Constants.FACE_COUNT))): (M_PID.calculate(Math.atan(180/Constants.FACE_COUNT))));
     }
     //Gyroscope
     M_Gyro = Gyro;
@@ -63,7 +63,7 @@ public class SwerveSubsystem extends SubsystemBase
   public void periodic() 
   {
     K_Drive = Drive_Groups[(((int)Math.round(M_Gyro.getCompassHeading()/((addFaces(Constants.FACE_COUNT, R_Face))/360)) > Drive_Groups.length)? (0): ((int)Math.round(M_Gyro.getCompassHeading()/((addFaces(Constants.FACE_COUNT, R_Face))/360))))];
-    K_Rotational = Rotational_Groups[(((int)Math.round(M_Gyro.getCompassHeading()/((addFaces(Constants.FACE_COUNT, R_Face))/360)) > Drive_Groups.length)? (0): ((int)Math.round(M_Gyro.getCompassHeading()/((addFaces(Constants.FACE_COUNT, R_Face))/360))))];
+    K_Rotational = Rotational_Groups[(((int)Math.round(M_Gyro.getCompassHeading()/((addFaces(Constants.FACE_COUNT, R_Face))/360)) > Rotational_Groups.length)? (0): ((int)Math.round(M_Gyro.getCompassHeading()/((addFaces(Constants.FACE_COUNT, R_Face))/360))))];
     N_Drives = new WPI_TalonFX[(Drive_Groups.length-1)];
     N_Rotationals = new WPI_TalonFX[(Rotational_Groups.length-1)];
     for(int i = 0, j = 0; i < (Drive.length) && j < (N_Drives.length); i++)
@@ -81,29 +81,29 @@ public class SwerveSubsystem extends SubsystemBase
   @Override
   public void simulationPeriodic() {}
   
+  //Drive Method
+  public void SwerveDrive(double JoystickL_X, double JoystickL_Y, double JoystickR_X)
+  {
+    K_Drive[(JoystickR_X > 0)? (1): ((JoystickR_X < 0)? (0): (0))].set(M_PID.calculate(Math.pow(JoystickL_Y,2)));
+    K_Rotational[(JoystickR_X > 0)? (1): ((JoystickR_X < 0)? (0): (0))].set(M_PID.calculate(Math.atan((180/(JoystickR_X * 100)))));
+    for(WPI_TalonFX N_Drive: N_Drives)
+    {
+      if(!(Objects.equals(N_Drive,K_Drive[(JoystickR_X > 0)? (1): ((JoystickR_X < 0)? (0): (0))])))
+        N_Drive.set(M_PID.calculate((Math.pow(JoystickL_Y,2) + Math.pow(JoystickL_Y,2))/2));
+    }
+    for(WPI_TalonFX N_Rotate: N_Rotationals)
+    {
+      if(!(Objects.equals(N_Rotate,K_Rotational[(JoystickR_X > 0)? (1): ((JoystickR_X < 0)? (0): (0))])))
+        N_Rotate.set(M_PID.calculate((Math.atan(JoystickL_Y/JoystickL_X) + Math.atan((180/(JoystickR_X * 100))))/2));
+    }
+  }
+
   //Decrement
   public void DecrementRotationalFace(){if(Objects.equals(R_Face,0)) {R_Face = (Constants.FACE_COUNT-1);} else {R_Face--;}}
+
   //Increment
   public void IncrementRotationalFace(){if(Objects.equals(R_Face,(Constants.FACE_COUNT-1))) {R_Face = 0;} else {R_Face++;}}
+
   //Add Two Faces
   public int addFaces(int Face_One, int Face_Two){if((Face_One + Face_Two) > (Constants.FACE_COUNT-1)){return ((Face_One + Face_Two) - Constants.FACE_COUNT);}else{return (Face_One + Face_Two);} }
-
-  //ACESSORS
-
-  //Return Current Rotational Face
-  public int getRotationalFace() {return R_Face;}
-  //Return K[D] MotorControllerGroup
-  public WPI_TalonFX[] getKDrive() {return K_Drive;}
-  //Return K[R] MotorControllerGroup
-  public WPI_TalonFX[] getKRotate() {return K_Rotational;}
-  //Return Rotaional Group
-  public WPI_TalonFX[] getRotationalGroup() {return Rotational;}
-  //Return Drive Group
-  public WPI_TalonFX[] getDriveGroup() {return Drive;}
-  //Return N[D]
-  public WPI_TalonFX[] getNRotates() {return N_Rotationals;}
-  //Return N[R]
-  public WPI_TalonFX[] getNDrives() {return N_Drives;}
-  //Return Current Compass Heading
-  public double getCurrentHeading() {return M_Gyro.getCompassHeading();}
 }
