@@ -48,10 +48,13 @@ public class SwerveSubsystem extends SubsystemBase
       Rotational[i] = new WPI_TalonFX(i+Constants.FACE_COUNT);
       Drive[i].setNeutralMode(NeutralMode.Brake);
       Rotational[i].setNeutralMode(NeutralMode.Brake);
-      if(!Objects.equals(i,Constants.FACE_COUNT-1)) {Rotational_Groups[i] = new WPI_TalonFX[] {Rotational[i],Rotational[i+1]};}
-      if(!Objects.equals(i,Constants.FACE_COUNT-1)) {Drive_Groups[i] = new WPI_TalonFX[] {Drive[i],Drive[i+1]};}
       if(Objects.equals((i % 2),0)){Rotational[i].setInverted(true);}
       Rotational[i].set((Objects.equals((i % 2),0))? (M_PID.calculate(Math.atan(-180/Constants.FACE_COUNT))): (M_PID.calculate(Math.atan(180/Constants.FACE_COUNT))));
+    }
+    for(int i = 0; i < Constants.FACE_COUNT-1; i++)
+    {
+      Rotational_Groups[i] = new WPI_TalonFX[] {Rotational[i],Rotational[i+1]};
+      Drive_Groups[i] = new WPI_TalonFX[] {Drive[i],Drive[i+1]};
     }
     //Gyroscope
     M_Gyro = Gyro;
