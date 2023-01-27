@@ -2,8 +2,7 @@
 package frc.robot;
 
 //Local
-import frc.robot.commands.AutonomousDriveCommand;
-import frc.robot.commands.TeleoperatedDriveCommand;
+import frc.robot.commands.*;
 import frc.robot.subsystems.SwerveSubsystem;
 //Libraries
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
@@ -13,6 +12,7 @@ import edu.wpi.first.wpilibj2.command.Command;
 import com.ctre.phoenix.sensors.Pigeon2;
 import java.lang.NullPointerException;
 import java.util.Objects;
+
 //Container Class
 public class RobotContainer
 {
@@ -22,8 +22,8 @@ public class RobotContainer
   //Controllers
   private CommandXboxController M_Controller;
   //Buttons
-  private Trigger Controller_A;
-  private Trigger Controller_B;
+  private Trigger Controller_Button_A;
+  private Trigger Controller_Button_B;
   //Gyroscopes
   private Pigeon2 M_Gyro;
 
@@ -37,9 +37,9 @@ public class RobotContainer
         catch(NullPointerException x) {M_Controller = null; System.out.println("Error: XboxController Not Found");}
       }
       //Buttons
-      try{Controller_A = M_Controller.a(); }
+      try{Controller_Button_A = M_Controller.a(); }
       catch(NullPointerException x) {System.out.println("Error: XboxController A Button Not Found");}
-      try{Controller_B = M_Controller.b(); }
+      try{Controller_Button_B = M_Controller.b(); }
       catch(NullPointerException x) {System.out.println("Error: XboxController B Button Not Found");}
       //Gyroscopes
       try{M_Gyro = new Pigeon2(4);}
@@ -59,9 +59,9 @@ public class RobotContainer
   private void configureButtonBindings() 
   {
     //When A Pressed, Increment Rotational Face.
-    Controller_A.onTrue(Commands.run(M_Drive::IncrementRotationalFace));
+    Controller_Button_A.onTrue(Commands.run(M_Drive::IncrementRotationalFace));
     //When B Pressed, Decrement Rotational Face.
-    Controller_B.onTrue(Commands.run(M_Drive::DecrementRotationalFace));
+    Controller_Button_B.onTrue(Commands.run(M_Drive::DecrementRotationalFace));
   }
   //ACESSORS
 
