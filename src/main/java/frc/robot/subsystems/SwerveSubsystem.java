@@ -1,7 +1,6 @@
 //Root Package
 package frc.robot.subsystems;
 
-
 //Libraries
 import com.ctre.phoenix.motorcontrol.can.WPI_TalonFX;
 import com.ctre.phoenix.motorcontrol.NeutralMode;
@@ -72,6 +71,7 @@ public class SwerveSubsystem extends SubsystemBase
     }
     //Gyroscope
     M_Gyro = Gyro;
+    M_Gyro.setYaw(0.0);
     //Rotational Face
     R_Face = 0;
   }
