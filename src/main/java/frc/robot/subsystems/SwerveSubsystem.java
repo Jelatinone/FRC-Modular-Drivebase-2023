@@ -2,35 +2,37 @@
 package frc.robot.subsystems;
 
 //Libraries
+import com.ctre.phoenix.sensors.SensorInitializationStrategy;
 import com.ctre.phoenix.motorcontrol.can.WPI_TalonFX;
+import com.ctre.phoenix.motorcontrol.FeedbackDevice;
+import com.ctre.phoenix.motorcontrol.TalonFXInvertType;
 import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.ctre.phoenix.motorcontrol.NeutralMode;
+import com.ctre.phoenix.motorcontrol.StatorCurrentLimitConfiguration;
+import com.ctre.phoenix.sensors.CANCoder;
 import com.ctre.phoenix.sensors.Pigeon2;
-import com.ctre.phoenixpro.hardware.CANcoder;
-import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
 import java.util.Objects;
+
 
 //Drive Subsystem Class
 public class SwerveSubsystem extends SubsystemBase
 {
   //CANcoder List
-  private CANcoder[] Encoder;
-  //S-Rotational List
-  private WPI_TalonFX[] K_Rotational;
-  private WPI_TalonFX[] N_Rotationals;
-  //S-Drive List
+  private CANCoder[] Encoder;
+  //S-Rotational Lists
+  private WPI_TalonFX[] K_Azimuth;
+  private WPI_TalonFX[] N_Azimuth;
+  //S-Drive Lists
   private WPI_TalonFX[] K_Drive;
   private WPI_TalonFX[] N_Drives;
-  //Large List
-  private final WPI_TalonFX[] Rotational;
+  //Large Lists
+  private final WPI_TalonFX[] Azimuth;
   private final WPI_TalonFX[] Drive;  
   //Group Lists
-  private final WPI_TalonFX[] [] Rotational_Groups;
+  private final WPI_TalonFX[] [] Azimuth_Groups;
   private final WPI_TalonFX[] [] Drive_Groups;  
-  //PID Controller
-  private PIDController M_PID;
   //Gyroscope
   private final Pigeon2 M_Gyro;
   //Rotational Face
@@ -38,43 +40,61 @@ public class SwerveSubsystem extends SubsystemBase
   //Primary Constructor
   public SwerveSubsystem(Pigeon2 Gyro)
   {
-    //PID Controller
-    M_PID = new PIDController(Constants.SS_KP, Constants.SS_KI, Constants.SS_KD);
-    //Group Instancization\
-    Encoder = new CANcoder[(Constants.FACE_COUNT)];
+    //Grouping Instancization
+    Encoder = new CANCoder[(Constants.FACE_COUNT)];
     Drive = new WPI_TalonFX[(Constants.FACE_COUNT)];
     Drive_Groups = new WPI_TalonFX[(Constants.FACE_COUNT)] [2];
-    Rotational = new WPI_TalonFX[(Constants.FACE_COUNT)];
-    Rotational_Groups = new WPI_TalonFX[(Constants.FACE_COUNT)] [2];
+    Azimuth = new WPI_TalonFX[(Constants.FACE_COUNT)];
+    Azimuth_Groups = new WPI_TalonFX[(Constants.FACE_COUNT)] [2];
+    //Modular Instancization
     if(Objects.equals(Constants.AUTOMATIC_INSTANCIZATION,true))
     {
-      //Modular Motor Instancization
       for(int i = 0; i < Constants.FACE_COUNT; i++)
       {
-        Encoder[i] = new CANcoder((Constants.FACE_COUNT + 1) + i);
+        Encoder[i] = new CANCoder(i);
         Drive[i] = new WPI_TalonFX(i);
-        Rotational[i] = new WPI_TalonFX(i+Constants.FACE_COUNT);
+        Azimuth[i] = new WPI_TalonFX(i+Constants.FACE_COUNT);
       }
     }
-    //Default Motor Instancization
+    //Default Instancization
     else
     {
       for(int i = 0; i < Constants.FACE_COUNT; i++)
       {
-        Encoder[i] = new CANcoder(Constants.CANCODER_INDEX[i]);
+        Encoder[i] = new CANCoder(Constants.CANCODER_INDEX[i]);
         Drive[i] = new WPI_TalonFX(Constants.DRIVE_MOTORS_INDEX[i]);
-        Rotational[i] = new WPI_TalonFX(Constants.ROTATIONAL_MOTORS_INDEX[i]);
+        Azimuth[i] = new WPI_TalonFX(Constants.ROTATIONAL_MOTORS_INDEX[i]);
       }
     }
-    //Motor Positioning, Grouping, and Neutralmode
+    //Positioning, Grouping, and Configurations
     for(int i = 0; i < Constants.FACE_COUNT; i++)
     {
-      if(!Objects.equals(i,Constants.FACE_COUNT-1)){Rotational_Groups[i] = new WPI_TalonFX[] {Rotational[i],Rotational[i+1]};}
-      if(!Objects.equals(i,Constants.FACE_COUNT-1)){Drive_Groups[i] = new WPI_TalonFX[] {Drive[i],Drive[i+1]};}
+      //Encoder Configuration
+      Encoder[i].configFactoryDefault();
+      Encoder[i].configMagnetOffset(Constants.CANCODER_OFFSET[i]);
+      Encoder[i].configSensorInitializationStrategy(SensorInitializationStrategy.BootToAbsolutePosition);
+      Encoder[i].setPositionToAbsolute();
+      //Drive Configuration
       Drive[i].setNeutralMode(NeutralMode.Brake);
-      Rotational[i].setNeutralMode(NeutralMode.Brake);
-      if(Objects.equals((i % 2),0)){Rotational[i].setInverted(true);}
-      toAngle(Rotational[i],(Objects.equals((i % 2),0))? (M_PID.calculate(Math.atan(-180/Constants.FACE_COUNT))): (M_PID.calculate(Math.atan(180/Constants.FACE_COUNT))));
+      Drive[i].setInverted(TalonFXInvertType.CounterClockwise);
+      Drive[i].configStatorCurrentLimit(new StatorCurrentLimitConfiguration());
+      Drive[i].config_kP(0, Constants.SS_D_KP);
+      Drive[i].config_kF(0, Constants.SS_D_KF);
+      //Rotational Configuration
+      Azimuth[i].setNeutralMode(NeutralMode.Brake);
+      Azimuth[i].configFactoryDefault();
+      Azimuth[i].setInverted(TalonFXInvertType.CounterClockwise);
+      Azimuth[i].configRemoteFeedbackFilter(Encoder[i], 0);
+      Azimuth[i].configSelectedFeedbackSensor(FeedbackDevice.RemoteSensor0);
+      Azimuth[i].setSelectedSensorPosition(Encoder[i].getAbsolutePosition());
+      Azimuth[i].config_kP(0, Constants.SS_A_KP);
+      Azimuth[i].config_kD(0, Constants.SS_A_KD);
+      //Additional Grouping
+      if(!Objects.equals(i,Constants.FACE_COUNT-1)){Azimuth_Groups[i] = new WPI_TalonFX[] {Azimuth[i],Azimuth[i+1]};}
+      if(!Objects.equals(i,Constants.FACE_COUNT-1)){Drive_Groups[i] = new WPI_TalonFX[] {Drive[i],Drive[i+1]};}
+      if(Objects.equals((i % 2),0)){Azimuth[i].setInverted(true);}
+      //Turn to respective Angle
+      toAngle(Azimuth[i],(Objects.equals((i % 2),0))? (Math.atan(-180/Constants.FACE_COUNT)): (Math.atan(180/Constants.FACE_COUNT)));
     }
     //Gyroscope
     M_Gyro = Gyro;
@@ -87,18 +107,18 @@ public class SwerveSubsystem extends SubsystemBase
   public void periodic() 
   {
     K_Drive = Drive_Groups[(((int)Math.round(M_Gyro.getCompassHeading()/((addFaces(Constants.FACE_COUNT, R_Face))/360)) > Drive_Groups.length)? (0): ((int)Math.round(M_Gyro.getCompassHeading()/((addFaces(Constants.FACE_COUNT, R_Face))/360))))];
-    K_Rotational = Rotational_Groups[(((int)Math.round(M_Gyro.getCompassHeading()/((addFaces(Constants.FACE_COUNT, R_Face))/360)) > Rotational_Groups.length)? (0): ((int)Math.round(M_Gyro.getCompassHeading()/((addFaces(Constants.FACE_COUNT, R_Face))/360))))];
+    K_Azimuth = Azimuth_Groups[(((int)Math.round(M_Gyro.getCompassHeading()/((addFaces(Constants.FACE_COUNT, R_Face))/360)) > Azimuth_Groups.length)? (0): ((int)Math.round(M_Gyro.getCompassHeading()/((addFaces(Constants.FACE_COUNT, R_Face))/360))))];
     N_Drives = new WPI_TalonFX[(Drive_Groups.length-1)];
-    N_Rotationals = new WPI_TalonFX[(Rotational_Groups.length-1)];
+    N_Azimuth = new WPI_TalonFX[(Azimuth_Groups.length-1)];
     for(int i = 0, j = 0; i < (Drive.length) && j < (N_Drives.length); i++)
     {
       if(!(Objects.equals(Drive[i],K_Drive[0]))){N_Drives[j] = Drive[i];j++;}
       else if(!(Objects.equals(Drive[i],K_Drive[1]))){N_Drives[j] = Drive[i];j++;}
     }
-    for(int i = 0, j = 0; i < (Rotational.length) && j < (N_Rotationals.length); i++)
+    for(int i = 0, j = 0; i < (Azimuth.length) && j < (N_Azimuth.length); i++)
     {
-      if(!(Objects.equals(Rotational[i],K_Rotational[0]))){N_Rotationals[j] = Rotational[i];j++;}
-      else if(!(Objects.equals(Rotational[i],K_Rotational[1]))){N_Rotationals[j] = Rotational[i];j++;}
+      if(!(Objects.equals(Azimuth[i],K_Azimuth[0]))){N_Azimuth[j] = Azimuth[i];j++;}
+      else if(!(Objects.equals(Azimuth[i],K_Azimuth[1]))){N_Azimuth[j] = Azimuth[i];j++;}
     }
   }
   //Simulation Periodic
@@ -108,36 +128,32 @@ public class SwerveSubsystem extends SubsystemBase
   //Drive Method
   public void SwerveDrive(double JoystickL_X, double JoystickL_Y, double JoystickR_X)
   {
-    K_Drive[(JoystickR_X > 0)? (1): ((JoystickR_X < 0)? (0): (0))].set(M_PID.calculate(Math.pow(JoystickL_Y,2)));
-    toAngle(K_Rotational[(JoystickR_X > 0)? (1): ((JoystickR_X < 0)? (0): (0))],(Math.atan((180/(JoystickR_X * 100)))));
+    toSpeed(K_Drive[(JoystickR_X > 0)? (1): ((JoystickR_X < 0)? (0): (0))],(Math.pow(JoystickL_Y,2)));
+    toAngle(K_Azimuth[(JoystickR_X > 0)? (1): ((JoystickR_X < 0)? (0): (0))],(Math.atan((180/(JoystickR_X * 100)))));
     for(WPI_TalonFX N_Drive: N_Drives)
     {
       if(!(Objects.equals(N_Drive,K_Drive[(JoystickR_X > 0)? (1): ((JoystickR_X < 0)? (0): (0))])))
-        N_Drive.set(M_PID.calculate((Math.pow(JoystickL_Y,2) + Math.pow(JoystickL_Y,2))/2));
+        toSpeed(N_Drive,((Math.pow(JoystickL_Y,2) + Math.pow(JoystickL_Y,2))/2));
     }
-    for(WPI_TalonFX N_Rotate: N_Rotationals)
+    for(WPI_TalonFX N_Rotate: N_Azimuth)
     {
-      if(!(Objects.equals(N_Rotate,K_Rotational[(JoystickR_X > 0)? (1): ((JoystickR_X < 0)? (0): (0))])))
+      if(!(Objects.equals(N_Rotate,K_Azimuth[(JoystickR_X > 0)? (1): ((JoystickR_X < 0)? (0): (0))])))
         toAngle(N_Rotate,((Math.atan(JoystickL_Y/JoystickL_X) + Math.atan((180/(JoystickR_X * 100)))/2)));
     }
   }
+  
+  //Add Two Faces
+  public int addFaces(int Face_One, int Face_Two){if((Face_One + Face_Two) > (Constants.FACE_COUNT-1)){return ((Face_One + Face_Two) - Constants.FACE_COUNT);}else{return (Face_One + Face_Two);}}
+
+  //Turn to Angle
+  public void toAngle(WPI_TalonFX Motor, Double Angle) {Motor.set(ControlMode.Position,((4096/(2*Math.PI)) * Angle));}
+
+  //Turn to Speed
+  public void toSpeed(WPI_TalonFX Motor, Double Speed) {Motor.set(ControlMode.Velocity,(Motor.getSelectedSensorVelocity()*Constants.DRIVE_GEAR_RATIO/(Math.PI * Constants.WHEEL_DIAMETER_METERS)*4096)/10);}
 
   //Decrement
   public void DecrementRotationalFace(){if(Objects.equals(R_Face,0)) {R_Face = (Constants.FACE_COUNT-1);} else {R_Face--;}}
 
   //Increment
   public void IncrementRotationalFace(){if(Objects.equals(R_Face,(Constants.FACE_COUNT-1))) {R_Face = 0;} else {R_Face++;}}
-
-  //Add Two Faces
-  public int addFaces(int Face_One, int Face_Two){if((Face_One + Face_Two) > (Constants.FACE_COUNT-1)){return ((Face_One + Face_Two) - Constants.FACE_COUNT);}else{return (Face_One + Face_Two);} }
-
-  //Turn to Angle
-  public void toAngle(WPI_TalonFX Motor, Double Angle)
-  {
-    Motor.set(ControlMode.Position,((4096/(2*Math.PI)) * Angle));
-  }
-  public void toSpeed(WPI_TalonFX Motor, Double Speed)
-  {
-    Motor.set(ControlMode.Velocity,)
-  }
 }
