@@ -51,9 +51,14 @@ public class SwerveSubsystem extends SubsystemBase
     {
       for(int i = 0; i < Constants.FACE_COUNT; i++)
       {
-        Encoder[i] = new CANCoder(i);
-        Drive[i] = new WPI_TalonFX(i);
-        Azimuth[i] = new WPI_TalonFX(i+Constants.FACE_COUNT);
+        try
+        {
+          Encoder[i] = new CANCoder(i);
+          Drive[i] = new WPI_TalonFX(i);
+          Azimuth[i] = new WPI_TalonFX(i+Constants.FACE_COUNT);
+        }
+        catch(NullPointerException exception) 
+        {System.out.println("At Modular Instancization, Caught Null Pointer Exception. \n Could not Instancize Motor " + i);}
       }
     }
     //Default Instancization
@@ -61,9 +66,14 @@ public class SwerveSubsystem extends SubsystemBase
     {
       for(int i = 0; i < Constants.FACE_COUNT; i++)
       {
-        Encoder[i] = new CANCoder(Constants.CANCODER_INDEX[i]);
-        Drive[i] = new WPI_TalonFX(Constants.DRIVE_MOTORS_INDEX[i]);
-        Azimuth[i] = new WPI_TalonFX(Constants.ROTATIONAL_MOTORS_INDEX[i]);
+        try
+        {
+          Encoder[i] = new CANCoder(Constants.CANCODER_INDEX[i]);
+          Drive[i] = new WPI_TalonFX(Constants.DRIVE_MOTORS_INDEX[i]);
+          Azimuth[i] = new WPI_TalonFX(Constants.ROTATIONAL_MOTORS_INDEX[i]);
+        }
+        catch(NullPointerException exception) 
+        {System.out.println("At Manual Instancization, Caught Null Pointer Exception. \n Could not Instancize Motor " + i);}
       }
     }
     //Positioning, Grouping, and Configurations
