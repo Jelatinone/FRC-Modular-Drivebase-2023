@@ -37,24 +37,38 @@ public class SwerveSubsystem extends SubsystemBase
   {
     //PID Controller
     M_PID = new PIDController(Constants.SS_KP, Constants.SS_KI, Constants.SS_KD);
-    //Modular Motor Instancisation
-    Rotational = new WPI_TalonFX[(Constants.FACE_COUNT)];
-    Rotational_Groups = new WPI_TalonFX[(Constants.FACE_COUNT)] [2];
+    //Group Instancization
     Drive = new WPI_TalonFX[(Constants.FACE_COUNT)];
     Drive_Groups = new WPI_TalonFX[(Constants.FACE_COUNT)] [2];
+    Rotational = new WPI_TalonFX[(Constants.FACE_COUNT)];
+    Rotational_Groups = new WPI_TalonFX[(Constants.FACE_COUNT)] [2];
+    if(Objects.equals(Constants.AUTOMATIC_INSTANCIZATION,true))
+    {
+      //Modular Motor Instancization
+      for(int i = 0; i < Constants.FACE_COUNT; i++)
+      {
+        Drive[i] = new WPI_TalonFX(i);
+        Rotational[i] = new WPI_TalonFX(i+Constants.FACE_COUNT);
+      }
+    }
+    //Default Motor Instancization
+    else
+    {
+      for(int i = 0; i < Constants.FACE_COUNT; i++)
+      {
+        Drive[i] = new WPI_TalonFX(Constants.DRIVE_MOTORS_INDEX[i]);
+        Rotational[i] = new WPI_TalonFX(Constants.ROTATIONAL_MOTORS_INDEX[i]);
+      }
+    }
+    //Motor Positioning, Grouping, and Neutralmode
     for(int i = 0; i < Constants.FACE_COUNT; i++)
     {
-      Drive[i] = new WPI_TalonFX(i);
-      Rotational[i] = new WPI_TalonFX(i+Constants.FACE_COUNT);
+      if(!Objects.equals(i,Constants.FACE_COUNT-1)){Rotational_Groups[i] = new WPI_TalonFX[] {Rotational[i],Rotational[i+1]};}
+      if(!Objects.equals(i,Constants.FACE_COUNT-1)){Drive_Groups[i] = new WPI_TalonFX[] {Drive[i],Drive[i+1]};}
       Drive[i].setNeutralMode(NeutralMode.Brake);
       Rotational[i].setNeutralMode(NeutralMode.Brake);
       if(Objects.equals((i % 2),0)){Rotational[i].setInverted(true);}
       Rotational[i].set((Objects.equals((i % 2),0))? (M_PID.calculate(Math.atan(-180/Constants.FACE_COUNT))): (M_PID.calculate(Math.atan(180/Constants.FACE_COUNT))));
-    }
-    for(int i = 0; i < Constants.FACE_COUNT-1; i++)
-    {
-      Rotational_Groups[i] = new WPI_TalonFX[] {Rotational[i],Rotational[i+1]};
-      Drive_Groups[i] = new WPI_TalonFX[] {Drive[i],Drive[i+1]};
     }
     //Gyroscope
     M_Gyro = Gyro;
