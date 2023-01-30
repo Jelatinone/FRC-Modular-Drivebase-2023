@@ -11,7 +11,9 @@ import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.Command;
 import java.lang.NullPointerException;
 
-//Container Class
+/**
+ * Robot Container Class
+ */
 public class RobotContainer
 {
   //INSTANCE VARIABLES
