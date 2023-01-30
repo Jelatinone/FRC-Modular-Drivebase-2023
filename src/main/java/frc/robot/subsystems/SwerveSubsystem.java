@@ -16,7 +16,9 @@ import frc.robot.Constants;
 import java.util.Objects;
 
 
-//Drive Subsystem Class
+/**
+ * Swerve Drive Class
+ */
 public class SwerveSubsystem extends SubsystemBase
 {
   //CANcoder List
@@ -112,7 +114,9 @@ public class SwerveSubsystem extends SubsystemBase
     //Rotational Face
     R_Face = 0;
   }
-  //Periodic Subsystem
+  /**
+   * Periodically sets motors to the correct motor groupings
+   */
   @Override
   public void periodic() 
   {
@@ -135,7 +139,12 @@ public class SwerveSubsystem extends SubsystemBase
   @Override
   public void simulationPeriodic() {}
   
-  //Drive Method
+  /** 
+   * Given input executes sets motors to correct speeds
+   * @param JoystickL_X - The Left Joystick X Component
+   * @param JoystickL_Y - The Left Joystick Y Component
+   * @param JoystickR_X - The Right Joystick X Component
+   */
   public void SwerveDrive(double JoystickL_X, double JoystickL_Y, double JoystickR_X)
   {
     toSpeed(K_Drive[(JoystickR_X > 0)? (1): ((JoystickR_X < 0)? (0): (0))],(Math.pow(JoystickL_Y,2)));
@@ -152,18 +161,34 @@ public class SwerveSubsystem extends SubsystemBase
     }
   }
   
-  //Add Two Faces
+  /** 
+   * Adds two given faces according to face count
+   * @param Face_One - First Added Face Component
+   * @param Face_Two - Second Added Face Component
+   */
   public int addFaces(int Face_One, int Face_Two){if((Face_One + Face_Two) > (Constants.FACE_COUNT-1)){return ((Face_One + Face_Two) - Constants.FACE_COUNT);}else{return (Face_One + Face_Two);}}
 
-  //Turn to Angle
+  /** 
+   * Turns given motor motors to given angle
+   * @param Motor - Motor to set
+   * @param Angle - Angle for motor
+   */
   public void toAngle(WPI_TalonFX Motor, Double Angle) {Motor.set(ControlMode.Position,((4096/(2*Math.PI)) * Angle));}
 
-  //Turn to Speed
+  /** 
+   * Turns given motor motors to given speed
+   * @param Motor - Motor to set
+   * @param Speed - Speed for motor
+   */
   public void toSpeed(WPI_TalonFX Motor, Double Speed) {Motor.set(ControlMode.Velocity,(Motor.getSelectedSensorVelocity()*Constants.DRIVE_GEAR_RATIO/(Math.PI * Constants.WHEEL_DIAMETER_METERS)*4096)/10);}
 
-  //Decrement
+  /**
+   *  Decrements the {@value} R_FACE Component
+   */
   public void DecrementRotationalFace(){if(Objects.equals(R_Face,0)) {R_Face = (Constants.FACE_COUNT-1);} else {R_Face--;}}
 
-  //Increment
+  /**
+   *  Increments the {@value} R_FACE Component
+   */
   public void IncrementRotationalFace(){if(Objects.equals(R_Face,(Constants.FACE_COUNT-1))) {R_Face = 0;} else {R_Face++;}}
 }
