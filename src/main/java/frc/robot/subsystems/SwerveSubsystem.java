@@ -38,7 +38,7 @@ public class SwerveSubsystem extends SubsystemBase
   //Rotational Face
   private int R_Face;
   //Primary Constructor
-  public SwerveSubsystem(Pigeon2 Gyro)
+  public SwerveSubsystem()
   {
     //Grouping Instancization
     Encoder = new CANCoder[(Constants.FACE_COUNT)];
@@ -70,7 +70,7 @@ public class SwerveSubsystem extends SubsystemBase
         {
           Encoder[i] = new CANCoder(Constants.CANCODER_INDEX[i]);
           Drive[i] = new WPI_TalonFX(Constants.DRIVE_MOTORS_INDEX[i]);
-          Azimuth[i] = new WPI_TalonFX(Constants.ROTATIONAL_MOTORS_INDEX[i]);
+          Azimuth[i] = new WPI_TalonFX(Constants.AZIMUTH_MOTORS_INDEX[i]);
         }
         catch(NullPointerException exception) 
         {System.out.println("At Manual Instancization, Caught Null Pointer Exception. \n Could not Instancize Motor " + i);}
@@ -90,13 +90,13 @@ public class SwerveSubsystem extends SubsystemBase
       Drive[i].configStatorCurrentLimit(new StatorCurrentLimitConfiguration());
       Drive[i].config_kP(0, Constants.SS_D_KP);
       Drive[i].config_kF(0, Constants.SS_D_KF);
-      //Rotational Configuration
+      //Azimuth Configuration
       Azimuth[i].setNeutralMode(NeutralMode.Brake);
       Azimuth[i].configFactoryDefault();
       Azimuth[i].setInverted(TalonFXInvertType.CounterClockwise);
       Azimuth[i].configRemoteFeedbackFilter(Encoder[i], 0);
       Azimuth[i].configSelectedFeedbackSensor(FeedbackDevice.RemoteSensor0);
-      Azimuth[i].setSelectedSensorPosition(Encoder[i].getAbsolutePosition());
+      Azimuth[i].setSelectedSensorPosition(Encoder[0].getAbsolutePosition());
       Azimuth[i].config_kP(0, Constants.SS_A_KP);
       Azimuth[i].config_kD(0, Constants.SS_A_KD);
       //Additional Grouping
@@ -107,7 +107,7 @@ public class SwerveSubsystem extends SubsystemBase
       toAngle(Azimuth[i],(Objects.equals((i % 2),0))? (Math.atan(-180/Constants.FACE_COUNT)): (Math.atan(180/Constants.FACE_COUNT)));
     }
     //Gyroscope
-    M_Gyro = Gyro;
+    M_Gyro = new Pigeon2(Constants.GYRO_INDEX);
     M_Gyro.setYaw(0.0);
     //Rotational Face
     R_Face = 0;

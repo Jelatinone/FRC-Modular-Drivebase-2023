@@ -9,9 +9,7 @@ import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.Command;
-import com.ctre.phoenix.sensors.Pigeon2;
 import java.lang.NullPointerException;
-import java.util.Objects;
 
 //Container Class
 public class RobotContainer
@@ -22,30 +20,22 @@ public class RobotContainer
   //Controllers
   private CommandXboxController M_Controller;
   //Buttons
-  private Trigger Controller_Button_A;
-  private Trigger Controller_Button_B;
-  //Gyroscopes
-  private Pigeon2 M_Gyro;
-
+  private Trigger Controller_Increment_Button;
+  private Trigger Controller_Decrement_Button;
+ 
   //Constructor
   public RobotContainer() 
   {
       //Controllers
-      for(int i = 0; i <= 20 && Objects.equals(M_Controller,null); i++)
-      {
-        try{M_Controller = new CommandXboxController(i);}
-        catch(NullPointerException x) {M_Controller = null; System.out.println("Error: XboxController Not Found");}
-      }
+      try{M_Controller = new CommandXboxController(Constants.CONTROLLER_INDEX);}
+      catch(NullPointerException x) {M_Controller = null; System.out.println("Error: XboxController Not Found");}
       //Buttons
-      try{Controller_Button_A = M_Controller.a(); }
-      catch(NullPointerException x) {System.out.println("Error: XboxController A Button Not Found");}
-      try{Controller_Button_B = M_Controller.b(); }
-      catch(NullPointerException x) {System.out.println("Error: XboxController B Button Not Found");}
-      //Gyroscopes
-      try{M_Gyro = new Pigeon2(4);}
-      catch(NullPointerException x) {System.out.println("Error: Gyroscope Not Found");}
+      try{Controller_Increment_Button = Constants.CONTROLLER_INCREMENT_BUTTON; }
+      catch(NullPointerException x) {System.out.println("Error: XboxController Increment Button Not Found");}
+      try{Controller_Decrement_Button = Constants.CONTROLLER_DECREMENT_BUTTON; }
+      catch(NullPointerException x) {System.out.println("Error: XboxController Decrement Button Not Found");}
       //Subsystems
-      M_Drive = new SwerveSubsystem(M_Gyro);  
+      M_Drive = new SwerveSubsystem();  
       //Set Default
       M_Drive.setDefaultCommand(new TeleoperatedDriveCommand(
       M_Drive,
@@ -58,10 +48,10 @@ public class RobotContainer
   //Config Bindings
   private void configureButtonBindings() 
   {
-    //When A Pressed, Increment Rotational Face.
-    Controller_Button_A.onTrue(Commands.run(M_Drive::IncrementRotationalFace));
-    //When B Pressed, Decrement Rotational Face.
-    Controller_Button_B.onTrue(Commands.run(M_Drive::DecrementRotationalFace));
+    //When Increment Button Pressed, Increment Rotational Face
+    Controller_Increment_Button.onTrue(Commands.run(M_Drive::IncrementRotationalFace));
+    //When Decrement Button Pressed, Decrement Rotational Face
+    Controller_Decrement_Button.onTrue(Commands.run(M_Drive::DecrementRotationalFace));
   }
   //ACESSORS
 
