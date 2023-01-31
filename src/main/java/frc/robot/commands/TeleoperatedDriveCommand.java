@@ -25,9 +25,9 @@ public class TeleoperatedDriveCommand extends CommandBase
   public TeleoperatedDriveCommand(SwerveSubsystem Parent, DoubleSupplier Left_X, DoubleSupplier Left_Y, DoubleSupplier Right_X)
   {
     //Joystick Assignment
-    if(Math.abs(Left_X.getAsDouble()) > Constants.LEFT_X_JOYSTICK_DEADZONE){JoystickL_X = Left_X.getAsDouble();}else{JoystickL_X = 0.0;}
-    if(Math.abs(Left_Y.getAsDouble()) > Constants.LEFT_Y_JOYSTICK_DEADZONE){JoystickL_Y = Left_Y.getAsDouble();}else{JoystickL_Y = 0.0;}
-    if(Math.abs(Right_X.getAsDouble()) > Constants.RIGHT_X_JOYSTICK_DEADZONE){JoystickR_X = Right_X.getAsDouble();}else{JoystickR_X = 0.0;}
+    if(Math.abs(Left_X.getAsDouble()) > Constants.TELEDRIVECOMMAND.LEFT_X_JOYSTICK_DEADZONE){JoystickL_X = Left_X.getAsDouble();}else{JoystickL_X = 0.0;}
+    if(Math.abs(Left_Y.getAsDouble()) > Constants.TELEDRIVECOMMAND.LEFT_Y_JOYSTICK_DEADZONE){JoystickL_Y = Left_Y.getAsDouble();}else{JoystickL_Y = 0.0;}
+    if(Math.abs(Right_X.getAsDouble()) > Constants.TELEDRIVECOMMAND.RIGHT_X_JOYSTICK_DEADZONE){JoystickR_X = Right_X.getAsDouble();}else{JoystickR_X = 0.0;}
     //Parent Subsystem
     Parent_Subsystem = Parent;
     //Add Child Command To Parent Subsystem
