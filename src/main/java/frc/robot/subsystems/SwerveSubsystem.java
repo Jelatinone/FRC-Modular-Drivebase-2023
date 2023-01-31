@@ -69,9 +69,9 @@ public class SwerveSubsystem extends SubsystemBase
       {
         try
         {
-          Encoder[i] = new CANCoder(Constants.SWERVE.CANCODER_INDEX[i]);
-          Drive[i] = new WPI_TalonFX(Constants.SWERVE.DRIVE_MOTORS_INDEX[i]);
-          Azimuth[i] = new WPI_TalonFX(Constants.SWERVE.AZIMUTH_MOTORS_INDEX[i]);
+          Encoder[i] = new CANCoder(Constants.SWERVE.CANCODER_INDEX_VALUES[i]);
+          Drive[i] = new WPI_TalonFX(Constants.SWERVE.DRIVE_MOTORS_INDEX_VALUES[i]);
+          Azimuth[i] = new WPI_TalonFX(Constants.SWERVE.AZIMUTH_MOTORS_INDEX_VALUES[i]);
         }
         catch(NullPointerException exception) 
         {System.out.println("At Manual Instancization, Caught Null Pointer Exception. \n Could not Instancize Motor " + i);}
@@ -82,15 +82,15 @@ public class SwerveSubsystem extends SubsystemBase
     {
       //Encoder Configuration
       Encoder[i].configFactoryDefault();
-      Encoder[i].configMagnetOffset(Constants.SWERVE.CANCODER_OFFSET[i]);
+      Encoder[i].configMagnetOffset(Constants.SWERVE.CANCODER_OFFSET_VALUES[i]);
       Encoder[i].configSensorInitializationStrategy(SensorInitializationStrategy.BootToAbsolutePosition);
       Encoder[i].setPositionToAbsolute();
       //Drive Configuration
       Drive[i].setNeutralMode(NeutralMode.Brake);
       Drive[i].setInverted(TalonFXInvertType.CounterClockwise);
       Drive[i].configStatorCurrentLimit(new StatorCurrentLimitConfiguration());
-      Drive[i].config_kP(0, Constants.SWERVE.SS_D_KP);
-      Drive[i].config_kF(0, Constants.SWERVE.SS_D_KF);
+      Drive[i].config_kP(0, Constants.SWERVE.DRIVE_KP);
+      Drive[i].config_kF(0, Constants.SWERVE.DRIVE_KF);
       //Azimuth Configuration
       Azimuth[i].setNeutralMode(NeutralMode.Brake);
       Azimuth[i].configFactoryDefault();
@@ -98,8 +98,8 @@ public class SwerveSubsystem extends SubsystemBase
       Azimuth[i].configRemoteFeedbackFilter(Encoder[i], 0);
       Azimuth[i].configSelectedFeedbackSensor(FeedbackDevice.RemoteSensor0);
       Azimuth[i].setSelectedSensorPosition(Encoder[0].getAbsolutePosition());
-      Azimuth[i].config_kP(0, Constants.SWERVE.SS_A_KP);
-      Azimuth[i].config_kD(0, Constants.SWERVE.SS_A_KD);
+      Azimuth[i].config_kP(0, Constants.SWERVE.AZIMUTH_KP);
+      Azimuth[i].config_kD(0, Constants.SWERVE.AZIMUTH_KD);
       //Additional Grouping
       if(!Objects.equals(i,Constants.SWERVE.FACE_COUNT-1)){Azimuth_Groups[i] = new WPI_TalonFX[] {Azimuth[i],Azimuth[i+1]};}
       if(!Objects.equals(i,Constants.SWERVE.FACE_COUNT-1)){Drive_Groups[i] = new WPI_TalonFX[] {Drive[i],Drive[i+1]};}
