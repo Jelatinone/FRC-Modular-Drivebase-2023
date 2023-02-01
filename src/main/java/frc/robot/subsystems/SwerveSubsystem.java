@@ -2,19 +2,18 @@
 package frc.robot.subsystems;
 
 //Libraries
+import com.ctre.phoenix.motorcontrol.StatorCurrentLimitConfiguration;
 import com.ctre.phoenix.sensors.SensorInitializationStrategy;
 import com.ctre.phoenix.motorcontrol.can.WPI_TalonFX;
 import com.ctre.phoenix.motorcontrol.FeedbackDevice;
 import com.ctre.phoenix.motorcontrol.TalonFXInvertType;
 import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.ctre.phoenix.motorcontrol.NeutralMode;
-import com.ctre.phoenix.motorcontrol.StatorCurrentLimitConfiguration;
 import com.ctre.phoenix.sensors.CANCoder;
 import com.ctre.phoenix.sensors.Pigeon2;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
 import java.util.Objects;
-
 /**
  * Swerve Drive Class
  */
@@ -164,6 +163,7 @@ public class SwerveSubsystem extends SubsystemBase
    * Adds two given faces according to face count
    * @param Face_One - First Added Face Component
    * @param Face_Two - Second Added Face Component
+   * @return - The Two Added Faces
    */
   public int addFaces(int Face_One, int Face_Two){if((Face_One + Face_Two) > (Constants.SWERVE.FACE_COUNT-1)){return ((Face_One + Face_Two) - Constants.SWERVE.FACE_COUNT);}else{return (Face_One + Face_Two);}}
 
@@ -182,12 +182,13 @@ public class SwerveSubsystem extends SubsystemBase
   public void toSpeed(WPI_TalonFX Motor, Double Speed) {Motor.set(ControlMode.Velocity,(Motor.getSelectedSensorVelocity()*Constants.SWERVE.DRIVE_GEAR_RATIO/(Math.PI * Constants.SWERVE.WHEEL_DIAMETER_METERS)*4096)/10);}
 
   /**
-   *  Decrements the {@value} R_FACE Component
+   *  Decrements the R_FACE Component
    */
   public void DecrementRotationalFace(){if(Objects.equals(R_Face,0)) {R_Face = (Constants.SWERVE.FACE_COUNT-1);} else {R_Face--;}}
 
   /**
-   *  Increments the {@value} R_FACE Component
+   *  Increments the R_FACE Component
    */
   public void IncrementRotationalFace(){if(Objects.equals(R_Face,(Constants.SWERVE.FACE_COUNT-1))) {R_Face = 0;} else {R_Face++;}}
+
 }
